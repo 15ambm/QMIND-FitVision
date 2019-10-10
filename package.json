@@ -1,0 +1,30 @@
+{
+  "name": "qmind-fitvision",
+  "version": "1.0.0",
+  "description": "FitVision",
+  "main": "index.js",
+  "dependencies": {
+    "@tensorflow-models/posenet": "^2.1.3",
+    "@tensorflow/tfjs": "^1.2.11",
+    "@tensorflow/tfjs-node": "^1.2.11",
+    "blueimp-load-image": "^2.24.0",
+    "canvas": "^2.6.0",
+    "global": "^4.4.0",
+    "ts-node": "^8.4.1",
+    "typescript": "^3.6.3"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/15ambm/QMIND-FitVision.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/15ambm/QMIND-FitVision/issues"
+  },
+  "homepage": "https://github.com/15ambm/QMIND-FitVision#readme"
+}
