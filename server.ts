@@ -1,4 +1,5 @@
 import express from 'express';
+import _ from 'lodash';
 import * as posenet from '@tensorflow-models/posenet';
 import { createCanvas, loadImage } from 'canvas';
 
@@ -17,10 +18,14 @@ app.get("/", async (req, res) => {
 
   const net = await posenet.load();
   const pose = await net.estimateSinglePose(canvas as unknown as HTMLCanvasElement);
+  const connectedJoints = posenet.getAdjacentKeyPoints(pose.keypoints, 0);
 
-  ctx.fillStyle = 'red';
-  pose.keypoints.forEach(point => {
-    ctx.fillRect(point.position.x, point.position.y, 5, 5);
+  ctx.strokeStyle = 'blue';
+  ctx.lineWidth = 5;
+  connectedJoints.forEach(points => {
+    ctx.moveTo(points[0].position.x, points[0].position.y);
+    ctx.lineTo(points[1].position.x, points[1].position.y);
+    ctx.stroke();
   });
 
   canvas.createPNGStream().pipe(res);
