@@ -2,6 +2,10 @@
   "ExpandedNodes": [
     ""
   ],
+<<<<<<< HEAD
   "SelectedNode": "\\server.ts",
+=======
+  "SelectedNode": "\\.gitignore",
+>>>>>>> 9bf604b7b38f47ea20540fbc84fa4a140a89e73d
   "PreviewInSolutionExplorer": false
 }
