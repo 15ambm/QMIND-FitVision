@@ -2,7 +2,7 @@ import express from 'express';
 import _ from 'lodash';
 import * as posenet from '@tensorflow-models/posenet';
 import { createCanvas, loadImage } from 'canvas';
-
+import {getRAngle, getLAngle, isSquat} from './mathLogic'
 // ideally use this optimized node backend but can't get this to work
 //require('@tensorflow/tfjs-node');
 
@@ -11,7 +11,7 @@ const PORT = 8080;
 
 app.get("/", async (req, res) => {
   res.setHeader('Content-Type', 'image/png');
-  const image = await loadImage('image2.jpg');
+  const image = await loadImage('image6.jpg');
   const canvas = createCanvas(image.width, image.height);
   const ctx = canvas.getContext('2d');
   ctx.drawImage(image, 0, 0);
@@ -27,23 +27,21 @@ app.get("/", async (req, res) => {
     ctx.lineTo(points[1].position.x, points[1].position.y);
       ctx.stroke();
   });
-    let lSquat = false;
-    const leftHipX = Math.floor(pose.keypoints[11].position.x);
-    const leftHipY = Math.floor(pose.keypoints[11].position.y);
-    const leftKneeX = Math.floor(pose.keypoints[13].position.x);
-    const leftKneeY = Math.floor(pose.keypoints[13].position.y);
-    const leftAnkleX = Math.floor(pose.keypoints[15].position.x);
-    const leftAnkleY = Math.floor(pose.keypoints[15].position.y);
-    let leftThigh = Math.sqrt(Math.pow(leftHipX - leftKneeX, 2) + Math.pow(leftHipY - leftKneeY, 2));
-    let leftShin = Math.sqrt(Math.pow(leftAnkleX - leftKneeX, 2) + Math.pow(leftAnkleY - leftKneeY, 2));
-    let left = Math.sqrt(Math.pow(leftHipX - leftAnkleX, 2) + Math.pow(leftHipY - leftAnkleY, 2));
-    if (Math.acos((Math.pow(leftThigh, 2) + Math.pow(leftShin, 2)
-        - Math.pow(left, 2)) / (2 * leftThigh * leftShin)) < Math.PI) {
-        lSquat = true;
+    const lSide = getLAngle(pose);
+    const rSide = getRAngle(pose);
+    const lSquat = isSquat(lSide);
+    const rSquat = isSquat(rSide);
+    console.log("left angle: ", lSide, "\nright angle: ", rSide);
+    if (lSquat && rSquat) {
+        console.log("This Is A Squat!");
+    } else if (lSquat) {
+        console.log("Left Side Is Correct, Right Is Not");
+    } else if (rSquat) {
+        console.log("Right Side Is Correct, Left Is Not");
+    } else {
+        console.log("Not a Squat!");
     }
-    console.log(Math.acos((Math.pow(leftThigh, 2) + Math.pow(leftShin, 2)
-        - Math.pow(left, 2)) / (2 * leftThigh * leftShin)));
-    console.log(lSquat);
+    
   canvas.createPNGStream().pipe(res);
 });
 
