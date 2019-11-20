@@ -1,7 +1,7 @@
 ﻿import { getRAngle, getLAngle, isSquat } from './math';
 import { View } from './camera';
 import { Pose } from "@tensorflow-models/posenet";
-function log(pose: Pose) {
+function log(pose: Pose, ctr : number) {
     console.log(pose.keypoints);
 
     const lSide = getLAngle(pose);
@@ -9,18 +9,23 @@ function log(pose: Pose) {
     const lSquat = isSquat(lSide);
     const rSquat = isSquat(rSide);
     console.log("left angle: ", lSide, "\nright angle: ", rSide);
-
-    if (lSquat && rSquat) {
-        console.log("This Is A Squat!");
-    } else if (lSquat) {
-        console.log("Left Side Is Correct, Right Is Not");
-    } else if (rSquat) {
-        console.log("Right Side Is Correct, Left Is Not");
-    } else {
-        console.log("Not a Squat!");
+    if (View(pose) == 'front') {
+        if (lSquat && rSquat) {
+            console.log("This is a Squat!");
+            ctr++;
+        }
+        else {
+            console.log("Not a Squat!");
+        }
+    } else if (View(pose) == 'side') {
+        if (lSquat || rSquat) {
+            console.log("This is a Squat");
+        } else {
+            console.log("Not a Squat!");
+        }
     }
-
     console.log(View(pose), " view");
+    return ctr;
 }
 
 export { log }; 

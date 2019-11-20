@@ -4,12 +4,14 @@ import * as posenet from '@tensorflow-models/posenet';
 import { createCanvas, loadImage } from 'canvas';
 import { Resize } from './camera';
 import { log } from './output';
+import path from 'path';
 // ideally use this optimized node backend but can't get this to work
 //require('@tensorflow/tfjs-node');
 
 const app = express();
 const PORT = 8080;
-
+let ctr = 0;
+/*
 app.get("/", async (req, res) => {
     res.setHeader('Content-Type', 'image/png');
     const image = await loadImage('image.jpg');
@@ -33,7 +35,25 @@ app.get("/", async (req, res) => {
     log(pose);
     canvas.createPNGStream().pipe(res);
 });
+*/
+
+// ideally use this optimized node backend but can't get this to work
+//require('@tensorflow/tfjs-node');
+
+app.use(express.json());
+
+app.get('/', async (_req, res) => {
+    res.sendFile(path.join(__dirname, 'index.html'));
+});
+
+app.post('/', async (req, res) => {
+    const pose: posenet.Pose = req.body;
+    console.log(pose.keypoints);
+    res.send(pose);
+    ctr += log(pose, ctr);
+})
 
 app.listen(PORT, () => {
     console.log(`server started at http://localhost:${PORT}`);
 });
+
