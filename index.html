@@ -4,16 +4,38 @@
     <script src="https://unpkg.com/@tensorflow/tfjs"></script>
     <script src="https://unpkg.com/@tensorflow-models/posenet"></script>
     <script src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js'></script>
-    <script type="text/javascript" src="output.ts"></script>
-    <script>
+    
+    <script type="module">
+
+      //import {isSquat} from "./math.ts";
+      
       const WIDTH = 960, HEIGHT = 720;
       let video;
       let canvas, ctx;
-      let net, pose, connectedJoints;
-      const loadWebcam = () => {
-        video = document.getElementById('video');
-        canvas = document.getElementById('canvas');
-        ctx = canvas.getContext('2d');
+      
+      const entry = async () => {
+
+        loadWebcam()
+
+        video.addEventListener('play', async () => {
+            canvas.width = WIDTH;
+            canvas.height = HEIGHT;
+
+            let net = await posenet.load();
+
+            // Capture current frame and create canvas for that frame
+            //await analyseFrame();
+            
+            drawPose(WIDTH, HEIGHT, net);
+
+        }, false);
+
+      }
+
+      const loadWebcam = async () =>  {
+        video =  document.getElementById('video');
+        canvas =  document.getElementById('canvas');
+        ctx =  canvas.getContext('2d');
         navigator.mediaDevices.getUserMedia({
           audio: false,
           video: true
@@ -25,22 +47,27 @@
           };
         })
         .catch(console.error);
-        video.addEventListener('play', () => {
-            canvas.width = WIDTH;
-            canvas.height = HEIGHT;
-            draw(WIDTH, HEIGHT);
-        }, false);
-        setInterval(sendPose, 2000);
       }
-      const draw = async (w, h) => {
 
-        await analyseFrame();
+      const drawPose = async (w, h, net) => {
+
+        let obj = await analyseFrame(net);
+
+        let connectedJoints = obj.joints;
+        let pose = obj.pose;
+
+        // let squat = isSquat(pose);
+
         ctx.clearRect(0, 0, w, h);
         ctx.drawImage(video, 0, 0, w, h);
 
         ctx.strokeStyle = 'blue';
         ctx.lineWidth = 2;
         ctx.fillStyle = 'blue';
+
+        sendPose(pose);
+        console.log("drawing");
+
         pose && pose.keypoints && pose.keypoints.forEach(point => {
           if(point.score > 0.5) ctx.fillRect(point.position.x, point.position.y, 5, 5);
         });
@@ -53,24 +80,29 @@
             ctx.stroke();
           }
         });
-        setTimeout(draw, 20, w, h);
+        setTimeout(drawPose, 20, w, h, net);
       }
-      const analyseFrame = async () => {
-        net = net || await posenet.load();
-        pose = await net.estimateSinglePose(canvas);
-          connectedJoints = posenet.getAdjacentKeyPoints(pose.keypoints, 0);
+
+      const analyseFrame = async (net) => {
+        let pose = await net.estimateSinglePose(canvas);
+          return {
+            pose,
+            joints:posenet.getAdjacentKeyPoints(pose.keypoints, 0)
+          };
       }
-      const sendPose = async () => {
-        console.log('fetch');
+
+      const sendPose = async (pose) => {
         fetch('/', {
           method: 'post',
           headers: { 'Content-Type': 'application/json'},
           body: JSON.stringify(pose)
         })
       }
-        window.addEventListener('load', loadWebcam, false) = function(){
-            console.log(ctr);
-        };
+
+      // entry point
+      // when the window loads initially we call our entry() function
+      window.addEventListener('load', entry, false);
+
     </script>
 </head>
 <body>
