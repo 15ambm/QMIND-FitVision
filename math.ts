@@ -104,15 +104,26 @@ function squatView(pose: Pose) {
     }      
 }
 
-function Resize(iw: number, ih: number) {
-    const scale = Math.min((1100 / iw), (1100 / ih));
-    const iwScaled = iw * scale;
-    const ihScaled = ih * scale;
-    return { iwScaled, ihScaled };
+function Confidence(pose: Pose){
+    const leftShoulder = pose.keypoints[5].score;
+    const rightShoulder = pose.keypoints[6].score;
+    const leftHip = pose.keypoints[11].score;
+    const rightHip = pose.keypoints[12].score;
+    const leftKnee = pose.keypoints[13].score;
+    const rightKnee = pose.keypoints[14].score;
+    const leftAnkle = pose.keypoints[15].score;
+    const rightAnkle = pose.keypoints[16].score;
+const LeftLowest = Math.min(leftShoulder,leftHip,leftKnee,leftAnkle);
+const RightLowest = Math.min(rightShoulder,rightHip,rightKnee,rightAnkle);
+const lowest = Math.min(RightLowest,LeftLowest);
+return lowest;
+
 }
 
 function isSquat(pose: Pose) {
-    
+
+    if (Confidence(pose)<0.8)return false;
+    else{
     const leftKneeAngle = getLeftKneeAngle(pose);
     const rightKneeAngle = getRightKneeAngle(pose);
     const leftHipAngle = getLeftHipAngle(pose);
@@ -127,7 +138,7 @@ function isSquat(pose: Pose) {
                 "\nview: ", view);
 
     if(view == 0) {
-        if(leftKneeAngle < 75 && rightKneeAngle < 75 && leftHipAngle < 90 && rightHipAngle < 90) {
+        if(leftKneeAngle < 90 && rightKneeAngle < 90 && leftHipAngle < 90 && rightHipAngle < 90) {
                 return true;
             } else return false;
     } else if (Math.abs(view) == 1) {
@@ -147,6 +158,7 @@ function isSquat(pose: Pose) {
             } else return false;
         
     }
+}
 
 }
-export { isSquat };
+export default isSquat;

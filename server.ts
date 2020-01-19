@@ -3,7 +3,7 @@ import _ from 'lodash';
 import * as posenet from '@tensorflow-models/posenet';
 import { createCanvas, loadImage } from 'canvas';
 import path from 'path';
-import { isSquat } from "./math";
+import isSquat from "./math";
 
 const app = express();
 const PORT = 8080;
@@ -28,7 +28,7 @@ app.post('/', async (req, res) => {
 
 app.get("/image", async (req, res) => {
     res.setHeader('Content-Type', 'image/png');
-    const image = await loadImage('image4.jpg');
+    const image = await loadImage('image1.jpg');
     const canvas = createCanvas(image.width, image.height);
     const ctx = canvas.getContext('2d');
     ctx.drawImage(image, 0, 0);
@@ -57,6 +57,9 @@ app.get("/image", async (req, res) => {
     canvas.createPNGStream().pipe(res);
 });
 
+app.get('/math.js', async (_req, res) => {
+    res.sendFile(path.join(__dirname, 'math.js'));
+});
 
 app.listen(PORT, () => {
     console.log(`server started at http://localhost:${PORT}`);
