@@ -123,7 +123,6 @@ return lowest;
 function isSquat(pose: Pose) {
 
     if (Confidence(pose)<0.8)return false;
-    else{
     const leftKneeAngle = getLeftKneeAngle(pose);
     const rightKneeAngle = getRightKneeAngle(pose);
     const leftHipAngle = getLeftHipAngle(pose);
@@ -158,7 +157,6 @@ function isSquat(pose: Pose) {
             } else return false;
         
     }
-}
 
 }
 export default isSquat;
