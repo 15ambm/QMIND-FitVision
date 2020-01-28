@@ -3,7 +3,7 @@ import _ from 'lodash';
 import * as posenet from '@tensorflow-models/posenet';
 import { createCanvas, loadImage } from 'canvas';
 import path from 'path';
-import { isSquat } from "./math";
+import { isSquat } from "./squat";
 
 const app = express();
 const PORT = 8080;
@@ -19,11 +19,8 @@ app.get('/', async (_req, res) => {
 });
 
 app.post('/', async (req, res) => {
-    //console.log(req.body);
     const pose: posenet.Pose = req.body;
-    //console.log(pose.keypoints);
     res.send(pose);
-    //ctr += log(pose, ctr);
 })
 
 app.get("/image", async (req, res) => {
