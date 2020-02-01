@@ -62,4 +62,34 @@ function getRightHipAngle(pose: Pose) {
     return theta;
 }
 
-export { getLeftKneeAngle, getRightKneeAngle, getLeftHipAngle, getRightHipAngle }
+function getRightArmPitAngle(pose: Pose){
+    const rHipX = Math.floor(pose.keypoints[12].position.x);
+    const rHipY = Math.floor(pose.keypoints[12].position.y);
+    const rShoulderX = Math.floor(pose.keypoints[6].position.x);
+    const rShoulderY = Math.floor(pose.keypoints[6].position.y);
+    const rWristX = Math.floor(pose.keypoints[10].position.x);
+    const rWristY = Math.floor(pose.keypoints[10].position.y);
+    let RightAbdomen = Math.sqrt(Math.pow(rShoulderX - rHipX, 2) + Math.pow(rShoulderY - rHipY, 2));
+    let RightArm = Math.sqrt(Math.pow(rWristX - rShoulderX,2) + Math.pow(rWristY - rShoulderY, 2));
+    let WristToHip = Math.sqrt(Math.pow(rWristX - rHipX, 2) + Math.pow(rWristY - rHipY, 2));   //hypotenuse 
+    let theta = Math.acos((Math.pow(RightAbdomen, 2) + Math.pow(RightArm, 2) - Math.pow(WristToHip, 2)) / (2 * RightArm * RightAbdomen));
+    theta = Math.floor((100 * theta * 180) / Math.PI) / 100;
+    return theta;
+}
+
+function getLeftArmPitAngle(pose: Pose){
+    const lHipX = Math.floor(pose.keypoints[11].position.x);
+    const lHipY = Math.floor(pose.keypoints[11].position.y);
+    const lShoulderX = Math.floor(pose.keypoints[5].position.x);
+    const lShoulderY = Math.floor(pose.keypoints[5].position.y);
+    const lWristX = Math.floor(pose.keypoints[9].position.x);
+    const lWristY = Math.floor(pose.keypoints[9].position.y);
+    let LeftAbdomen = Math.sqrt(Math.pow(lShoulderX - lHipX, 2) + Math.pow(lShoulderY - lHipY, 2));
+    let LeftArm = Math.sqrt(Math.pow(lWristX - lShoulderX,2) + Math.pow(lWristY - lShoulderY, 2));
+    let WristToHip = Math.sqrt(Math.pow(lWristX - lHipX, 2) + Math.pow(lWristY - lHipY, 2));   //hypotenuse 
+    let theta = Math.acos((Math.pow(LeftAbdomen, 2) + Math.pow(LeftArm, 2) - Math.pow(WristToHip, 2)) / (2 * LeftArm * LeftAbdomen));
+    theta = Math.floor((100 * theta * 180) / Math.PI) / 100;
+    return theta;
+}
+
+export { getLeftKneeAngle, getRightKneeAngle, getLeftHipAngle, getRightHipAngle, getRightArmPitAngle, getLeftArmPitAngle}

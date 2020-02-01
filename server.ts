@@ -3,7 +3,7 @@ import _ from 'lodash';
 import * as posenet from '@tensorflow-models/posenet';
 import { createCanvas, loadImage } from 'canvas';
 import path from 'path';
-import { isSquat } from "./squat";
+import { isSquat, isOverHead } from "./squat";
 
 const app = express();
 const PORT = 8080;
@@ -25,7 +25,7 @@ app.post('/', async (req, res) => {
 
 app.get("/image", async (req, res) => {
     res.setHeader('Content-Type', 'image/png');
-    const image = await loadImage('image4.jpg');
+    const image = await loadImage('os1.jpg');
     const canvas = createCanvas(image.width, image.height);
     const ctx = canvas.getContext('2d');
     ctx.drawImage(image, 0, 0);
@@ -35,10 +35,13 @@ app.get("/image", async (req, res) => {
     const connectedJoints = posenet.getAdjacentKeyPoints(pose.keypoints, 0);
 
     let squat = isSquat(pose);
+    let overhead = isOverHead(pose);
   
     if(squat){
         ctx.strokeStyle = 'green';
-    } else {
+    } else if ( squat && overhead) {
+        ctx.strokeStyle = 'yellow'
+    } else{
         ctx.strokeStyle = 'blue';
     }
 

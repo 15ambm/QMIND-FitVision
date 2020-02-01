@@ -1,6 +1,6 @@
 
 import { Pose } from "@tensorflow-models/posenet";
-import { getLeftKneeAngle, getRightKneeAngle, getLeftHipAngle, getRightHipAngle } from './math'
+import { getLeftKneeAngle, getRightKneeAngle, getLeftHipAngle, getRightHipAngle, getRightArmPitAngle, getLeftArmPitAngle } from './math'
 
 
 // determines from what general angle the subject is being filmed at
@@ -85,4 +85,19 @@ function isSquat(pose: Pose) {
 
 }
 
-export { isSquat };
+function isOverHead(pose: Pose){
+    const rightArmpitAngle = getRightArmPitAngle(pose);
+    const leftArmpitAngle = getLeftArmPitAngle(pose);
+    const view = squatView(pose);
+   
+    console.log(pose);
+    console.log("left armpit angle: ", leftArmpitAngle, 
+                "\nright armpit angle: ", rightArmpitAngle,
+                "\nview: ", view);
+
+                if ( rightArmpitAngle > 100 && rightArmpitAngle < 150 && leftArmpitAngle > 100 && leftArmpitAngle < 150){
+                    return true;
+                }
+}
+
+export { isSquat, isOverHead };
