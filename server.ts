@@ -28,7 +28,7 @@ app.post('/', async (req, res) => {
 
 app.get("/image", async (req, res) => {
     res.setHeader('Content-Type', 'image/png');
-    const image = await loadImage('image1.jpg');
+    const image = await loadImage('image2.jpg');
     const canvas = createCanvas(image.width, image.height);
     const ctx = canvas.getContext('2d');
     ctx.drawImage(image, 0, 0);
@@ -45,7 +45,7 @@ app.get("/image", async (req, res) => {
         ctx.strokeStyle = 'blue';
     }
 
-    ctx.lineWidth = 5;
+    ctx.lineWidth = 3;
     connectedJoints.forEach(points => {
         if(points[0].score > 0.8 && points[1].score > 0.8) {
             ctx.moveTo(points[0].position.x, points[0].position.y);
