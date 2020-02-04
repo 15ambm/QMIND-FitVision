@@ -19,11 +19,8 @@ app.get('/', async (_req, res) => {
 });
 
 app.post('/', async (req, res) => {
-    //console.log(req.body);
     const pose: posenet.Pose = req.body;
-    //console.log(pose.keypoints);
     res.send(pose);
-    //ctr += log(pose, ctr);
 })
 
 app.get("/image", async (req, res) => {
