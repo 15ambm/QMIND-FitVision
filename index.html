@@ -1,0 +1,94 @@
+﻿<html>
+<head>
+    <title>QMIND - FitVision</title>
+    <script src="https://unpkg.com/@tensorflow/tfjs"></script>
+    <script src="https://unpkg.com/@tensorflow-models/posenet"></script>
+    <script src='https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.3.0/socket.io.js'></script>
+    
+    <script type="text/javascript" src="math.js"></script>
+    <script type="module">
+
+const WIDTH = 960, HEIGHT = 720;
+
+      let video;
+      let canvas, ctx;
+      let net, pose, connectedJoints;
+      const loadWebcam = () => {
+        video = document.getElementById('video');
+        canvas = document.getElementById('canvas');
+        ctx = canvas.getContext('2d');
+
+        navigator.mediaDevices.getUserMedia({
+          audio: false,
+          video: true
+        })
+        .then(stream => {
+          video.srcObject = stream;
+          video.onloadedmetadata = _e => {
+            video.play();
+          };
+        })
+        .catch(console.error);
+
+        video.addEventListener('play', () => {
+            canvas.width = WIDTH;
+            canvas.height = HEIGHT;
+            draw(WIDTH, HEIGHT);
+        }, false);
+
+        setInterval(sendPose, 2000);
+      }
+
+      const draw = async (w, h) => {
+        
+        await analyseFrame();
+        ctx.clearRect(0, 0, w, h);
+        ctx.drawImage(video, 0, 0, w, h);
+        let squat  = isSquat(pose);
+        if (squat){
+        ctx.strokeStyle = 'green';
+        ctx.lineWidth = 2;
+        ctx.fillStyle = 'green';
+        }else{
+        ctx.strokeStyle = 'blue';
+        ctx.lineWidth = 2;
+        ctx.fillStyle = 'blue';
+        }
+        pose && pose.keypoints && pose.keypoints.forEach(point => {
+          if(point.score > 0.7) ctx.fillRect(point.position.x, point.position.y, 5, 5);
+        });
+        connectedJoints && connectedJoints.forEach(points => {
+          if(points[0].score > 0.7 && points[1].score > 0.7) {
+            ctx.beginPath();
+            ctx.moveTo(points[0].position.x, points[0].position.y);
+            ctx.lineTo(points[1].position.x, points[1].position.y);
+            ctx.closePath();
+            ctx.stroke();
+          }
+        });
+        setTimeout(draw, 200, w, h);
+      }
+
+      const analyseFrame = async () => {
+        net = net || await posenet.load();
+        pose = await net.estimateSinglePose(canvas);
+        connectedJoints = posenet.getAdjacentKeyPoints(pose.keypoints, 0);
+      }
+
+      const sendPose = async () => {
+        console.log('fetch');
+        fetch('/', {
+          method: 'post',
+          headers: { 'Content-Type': 'application/json'},
+          body: JSON.stringify(pose)
+        })
+      }
+
+      window.addEventListener('load', loadWebcam, false);
+    </script>
+</head>
+<body>
+    <video id='video' style='display: none;'></video>
+    <canvas id='canvas'></canvas>
+</body>
+</html>
